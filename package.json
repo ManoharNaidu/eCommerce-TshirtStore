@@ -1,0 +1,43 @@
+{
+  "name": "ecommerce-tshirtstore",
+  "version": "1.0.0",
+  "description": "Backend API for eCommerce Tshirt Store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManoharNaidu/eCommerce-tshirtStore.git"
+  },
+  "keywords": [
+    "backend",
+    "api"
+  ],
+  "author": "Manohar Naidu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ManoharNaidu/eCommerce-tshirtStore/issues"
+  },
+  "homepage": "https://github.com/ManoharNaidu/eCommerce-tshirtStore#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.0.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-fileupload": "^1.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.2.1",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.12",
+    "razorpay": "^2.9.2",
+    "stripe": "^14.20.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
