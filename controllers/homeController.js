@@ -8,6 +8,6 @@ exports.home = (req, res) => {
 exports.homedummy = (req, res) => {
     res.status(200).json({
         status : true,
-        message : "Welcome to the Dummy Page"
+        message : "Welcome to the Dummy Page in manu branch"
     })
 }
