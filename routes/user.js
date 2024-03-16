@@ -23,4 +23,5 @@ router
 
 // manager routes
 router.route('/manager/users').get(isLoggedIn, customRole("manager") ,managerAllUsers)
+
 module.exports = router;
