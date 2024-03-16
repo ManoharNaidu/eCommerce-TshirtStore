@@ -141,3 +141,70 @@ exports.resetPassword = bigPromise( async (req,res,next) => {
     cookieToken(user,res);
 })
 
+exports.getLoggedInUserDetails = bigPromise( async (req,res,next) => {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+        success : true,
+        user,
+    })
+})
+
+exports.changePassword = bigPromise( async (req,res,next) => {
+    const {oldPassword, newPassword} = req.body;
+    if(!oldPassword || !newPassword){
+        return next(new CustomError('Old and new password fields are required', 400))
+    }
+    if(oldPassword === newPassword){
+        return next(new CustomError('Old and new password cannot be same', 400))
+    }
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select('+password');
+    const isCorrectPassword = await user.IsValidPassword(oldPassword);
+    if(!isCorrectPassword){
+        return next(new CustomError('Old password is incorrect', 400))
+    }
+    user.password = newPassword;
+    await user.save();
+    cookieToken(user,res);
+
+})
+
+exports.updateUserDetails = bigPromise( async (req,res,next) => {
+    const newData = {
+        name : req.body.name,
+        email : req.body.email,
+    }
+
+    if( req.files && req.files.photo !== ''){
+
+        const user = User.findById(req.user.id);
+        // delete the previous photo
+        const resp = await cloudinary.v2.uploader.destroy(user.photo.id);
+
+        // upload new photo
+        let file = req.files.photo
+        const result = await cloudinary.v2.uploader.upload(file.tempFilePath,{
+            folder: "TshirtStore/user",
+            width: 150,
+            crop: "scale",
+        })
+        
+        newData.photo = {
+            id : result.public_id,
+            secureURL : result.secure_url,
+        }
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        newData,
+        {
+            new : true,
+            runValidators : true,
+            useFindAndModify : false,
+        }
+        )
+    res.status(200).json({
+        success : true,
+    })
+})
