@@ -57,7 +57,7 @@ exports.getOneProduct = bigPromise( async (req,res,next)=>{
     })
 })
 
-exports.updateProduct = bigPromise( async (req, res, next) => {
+exports.AdminupdateOneProduct = bigPromise( async (req, res, next) => {
     var product = await Product.findById(req.params.id);
     if(!product){
         return next(new CustomError('Product not found', 404))
@@ -104,5 +104,27 @@ exports.AdminGetProducts = bigPromise( async (req,res,next) => {
     res.status(200).json({
         success : true,
         data : products
+    })
+})
+
+exports.deleteOneProduct = bigPromise( async (req,res,next) => {
+    const product = await Product.findById(req.params.id);
+    if(!product){
+        return next(new CustomError('Product not found', 404))
+    }
+
+    if(product.user.toString() !== req.user.id || req.user.role !== 'admin'){
+        return next(new CustomError('You are not allowed to delete this product', 401))
+    }
+
+    for(let i = 0; i < product.photos.length; i++){
+        const res = await cloudinary.v2.uploader.destroy(product.photos[i].id);
+    }
+
+    // await product.remove();
+    await Product.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+        success : true,
+        message : 'Product deleted successfully'
     })
 })
