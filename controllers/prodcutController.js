@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const bigPromise = require('../middlewares/bigPromise');
 const CustomError = require('../utils/customError');
 const cloudinary = require('cloudinary');
+const WhereClause = require('../utils/whereClause');
 
 exports.addProduct = bigPromise( async (req,res,next) => {
     // handling images
@@ -27,5 +28,21 @@ exports.addProduct = bigPromise( async (req,res,next) => {
     res.status(201).json({
         success : true,
         data : product
+    })
+})
+
+
+exports.getProducts = bigPromise( async (req,res,next) => {
+    const resultPerPage = 1;
+    const totalProducts = await Product.countDocuments();
+
+    const products = new WhereClause(Product.find(),req.query).search().filter().pager(resultPerPage)
+    const result = await products.base.clone();
+    const filteredProducts = result.length;
+    res.status(200).json({
+        success : true,
+        result,
+        totalProducts,
+        filteredProducts,
     })
 })
