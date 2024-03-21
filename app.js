@@ -17,17 +17,33 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
+// temp checking ejs
+app.set('view engine', 'ejs');
+
 // cookie parser and fileupload
 app.use(cookieParser());
-app.use(fileUpload());
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+}));
 
 
 
 app.use(morgan("tiny"))
 
+
+// importing all routes
 const home = require('./routes/home');
+const user = require('./routes/user');
+const product = require('./routes/product');
 
 app.use("/api/v1",home);
+app.use("/api/v1",user);
+app.use("/api/v1",product);
 
+
+app.get("/singuptest",(req,res) => {
+    res.render('signuptest');
+})
 
 module.exports = app;
