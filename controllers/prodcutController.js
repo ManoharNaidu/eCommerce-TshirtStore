@@ -3,6 +3,7 @@ const bigPromise = require('../middlewares/bigPromise');
 const CustomError = require('../utils/customError');
 const cloudinary = require('cloudinary');
 const WhereClause = require('../utils/whereClause');
+const { json } = require('express');
 
 exports.addProduct = bigPromise( async (req,res,next) => {
     // handling images
@@ -58,7 +59,8 @@ exports.getOneProduct = bigPromise( async (req,res,next)=>{
 })
 
 exports.addReview = bigPromise( async (req,res,next) => {
-    const { rating, comment, productId } = req.body;
+    const { rating, comment } = req.body;
+    const { productId } = req.params;
 
     const review = {
         user : req.user.id,
@@ -81,7 +83,7 @@ exports.addReview = bigPromise( async (req,res,next) => {
         })
     }else{
         product.reviews.push(review);
-        product.numOfReviews = product.reviews.length;
+        product.numberOfReviews = product.reviews.length;
     }
 
     // calculate the rating
@@ -97,33 +99,43 @@ exports.addReview = bigPromise( async (req,res,next) => {
 })
 
 exports.deleteReview = bigPromise( async (req,res,next) => {
-    const { productId } = req.body; // or req.params.id or req.query.id
+    const { productId } = req.params; // or req.params.id or req.query.id
 
     const product = await Product.findById(productId);
 
+    if(product.reviews.length == 0){
+        return res.status(200).json({
+            success : false,
+            message : 'No reviews left for this product'
+        })
+    }
+
     const reviews = product.reviews.filter( (rev) => rev.user.toString() !== req.user.id.toString() );
-
-    const numOfReviews = reviews.length;
-
+    
     // calculate the rating
-    product.ratings = product.reviews.reduce( (acc,item) => item.rating + acc, 0)/ product.reviews.length;
+
+     const ratings = reviews.length > 0 ? reviews.reduce( (acc,item) => item.rating + acc, 0)/reviews.length : 0
 
     //  update the product
 
     await Product.findByIdAndUpdate(productId, {
         reviews,
-        numOfReviews,
-        ratings : product.ratings
+        numberOfReviews : reviews.length,
+        ratings
     }, {
         new : true,
         runValidators : true,
         useFindAndModify : false
     })
+    return res.status(200).json({
+        success : true,
+        message : 'Review deleted successfully'
+    })
 })
 
 
 exports.getOnlyReviewsForOneProduct = bigPromise( async (req,res,next) => {
-    const product = await Product.findById(req.query.id);
+    const product = await Product.findById(req.params.id);
 
     res.status(200).json({
         success : true,

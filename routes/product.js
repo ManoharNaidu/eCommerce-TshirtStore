@@ -6,9 +6,8 @@ const { addProduct, getProducts, AdminGetProducts, getOneProduct, AdminupdateOne
 // user routes
 router.route("/products").get(isLoggedIn, getProducts)
 router.route("/product/:id").get(isLoggedIn, getOneProduct)
-router.route("/product/:id/review").put(isLoggedIn, addReview)
-router.route("/product/:id/review").post(isLoggedIn, addReview)
-router.route("/product/:id/review").delete(isLoggedIn, deleteReview)
+router.route("/product/:productId/review").post(isLoggedIn, addReview)
+router.route("/product/:productId/review").delete(isLoggedIn, deleteReview)
 router.route("/product/:id/reviews").get(isLoggedIn, getOnlyReviewsForOneProduct)    
 
 // admin routes
