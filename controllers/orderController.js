@@ -33,3 +33,11 @@ exports.getOrder = bigPromise(async (req, res, next) => {
         order
     })
 })
+
+exports.getMyOrders = bigPromise(async (req, res, next) => {
+    const orders = await Order.find({user : req.user._id})
+    res.status(200).json({
+        success: true,
+        orders
+    })
+})
