@@ -141,7 +141,7 @@ exports.resetPassword = bigPromise( async (req,res,next) => {
 })
 
 exports.getLoggedInUserDetails = bigPromise( async (req,res,next) => {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
     res.status(200).json({
         success : true,
         user,
@@ -156,7 +156,7 @@ exports.changePassword = bigPromise( async (req,res,next) => {
     if(oldPassword === newPassword){
         return next(new CustomError('Old and new password cannot be same', 400))
     }
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const user = await User.findById(userId).select('+password');
     const isCorrectPassword = await user.IsValidPassword(oldPassword);
@@ -177,7 +177,7 @@ exports.updateUserDetails = bigPromise( async (req,res,next) => {
 
     if( req.files && req.files.photo !== ''){
 
-        const user = User.findById(req.user.id);
+        const user = User.findById(req.user._id);
         // delete the previous photo
         const resp = await cloudinary.v2.uploader.destroy(user.photo.id);
 
@@ -195,7 +195,7 @@ exports.updateUserDetails = bigPromise( async (req,res,next) => {
         }
     }
     const user = await User.findByIdAndUpdate(
-        req.user.id,
+        req.user._id,
         newData,
         {
             new : true,
